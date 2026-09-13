@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import apiRoutes from './routes/apiRoutes.js';
 
 dotenv.config();
 
@@ -15,6 +16,9 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(morgan('combined'));
+
+// API Routes Router
+app.use('/api', apiRoutes);
 
 // Health & Identity Endpoint
 app.get('/health', (req: Request, res: Response) => {
