@@ -41,30 +41,3 @@ export const generateChatCompletion = async (
     throw new Error(`Groq AI Processing Failed: ${error?.message || error}`);
   }
 };
-  stream: boolean = false
-) => {
-  if (!groqApiKey) {
-    throw new Error('GROQ_API_KEY is missing from server configuration.');
-  }
-
-  // Ensure system prompt is always injected at the beginning
-  const formattedMessages: MessagePayload[] = [
-    { role: 'system', content: SYSTEM_PROMPT },
-    ...messages.filter(m => m.role !== 'system')
-  ];
-
-  try {
-    const response = await groq.chat.completions.create({
-      messages: formattedMessages,
-      model: model,
-      temperature: 0.7,
-      max_tokens: 4096,
-      stream: stream
-    });
-
-    return response;
-  } catch (error: any) {
-    console.error('[Groq Service Error]:', error?.message || error);
-    throw new Error(`Failed to generate AI response: ${error?.message || 'Unknown error'}`);
-  }
-};
