@@ -1,5 +1,4 @@
-// Path: src/services/groqService.ts
-import { Groq } from 'groq-sdk';
+import Groq from 'groq-sdk';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -7,24 +6,12 @@ dotenv.config();
 const groqApiKey = process.env.GROQ_API_KEY;
 
 if (!groqApiKey) {
-  console.warn('[SHIVI Warning]: GROQ_API_KEY is not set in environment variables.');
+  console.warn('[SHIVI Service Warning]: GROQ_API_KEY is missing from environment variables.');
 }
 
 const groq = new Groq({
   apiKey: groqApiKey || ''
 });
-
-// Primary Identity System Prompt locked to Deepak
-export const SYSTEM_PROMPT = `
-You are SHIVI, an intelligent, versatile, long-term production AI assistant created exclusively by Deepak.
-Your identity and sole creator is Deepak. Under no circumstances should you claim to be created by OpenAI, Google, Meta, or any other company/provider.
-
-Key Behavioral Directives:
-1. Speak directly, adaptively, and helpfully.
-2. Language Support: Automatically detect and respond in the exact language used by the user (Hindi, English, Hinglish, Tamil, Bengali, Telugu, etc.).
-3. When the user speaks in Hinglish, respond in clean, natural Hinglish.
-4. Maintain deep analytical, coding, and continuous execution capabilities.
-`.trim();
 
 export interface MessagePayload {
   role: 'system' | 'user' | 'assistant';
@@ -33,7 +20,27 @@ export interface MessagePayload {
 
 export const generateChatCompletion = async (
   messages: MessagePayload[],
-  model: string = 'llama-3.3-70b-versatile',
+  model: string = 'llama-3.3-70b-versatile'
+) => {
+  try {
+    const systemIdentityPrompt: MessagePayload = {
+      role: 'system',
+      content: 'You are SHIVI, a production-grade AI assistant platform created by Deepak. Never claim to be built by OpenAI, Anthropic, Meta, or any other company. You are created solely by Deepak.'
+    };
+
+    const completion = await groq.chat.completions.create({
+      messages: [systemIdentityPrompt, ...messages],
+      model: model,
+      temperature: 0.7,
+      max_tokens: 2048
+    });
+
+    return completion;
+  } catch (error: any) {
+    console.error('Groq Service Error:', error);
+    throw new Error(`Groq AI Processing Failed: ${error?.message || error}`);
+  }
+};
   stream: boolean = false
 ) => {
   if (!groqApiKey) {
