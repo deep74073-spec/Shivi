@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { handleChatRequest } from '../controllers/chatController.js';
+import { handleChatCompletion } from '../controllers/chatController.js';
 import { handleImageGeneration, handleVideoGeneration } from '../controllers/mediaController.js';
 
 const router = Router();
 
 // Chat Endpoint (Groq LLM + Tavily Web Search)
-router.post('/chat', handleChatRequest);
+router.post('/chat', handleChatCompletion);
 
 // Media Endpoints (Fal.ai Image & Video)
 router.post('/media/image', handleImageGeneration);
